@@ -19,13 +19,9 @@ on:
           - desktop
           - shared
 
-env:
-  JAVA_HOME: /usr/lib/jvm/temurin-21-jdk-amd64
-  ANDROID_HOME: ${{ runner.temp }}/android-sdk
-
 jobs:
   shared-build:
-    if: ${{ github.event.inputs.build_target == 'all' || github.event.inputs.build_target == 'shared' || (github.event_name != 'workflow_dispatch' && github.event.inputs == null) }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target == 'all' || github.event.inputs.build_target == 'shared' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v8
@@ -46,7 +42,7 @@ jobs:
         run: ./gradlew :shared:build --no-daemon --no-parallel
 
   android-build:
-    if: ${{ github.event.inputs.build_target == 'all' || github.event.inputs.build_target == 'android' || (github.event_name != 'workflow_dispatch' && github.event.inputs == null) }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target == 'all' || github.event.inputs.build_target == 'android' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v8
@@ -63,10 +59,15 @@ jobs:
           key: ${{ runner.os }}-gradle-android-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-android-
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses --sdk_root=${{ runner.temp }}/android-sdk
       - name: Install Android SDK
-        run: sdkmanager --sdk_root=${{ env.ANDROID_HOME }} "platforms;android-35" "build-tools;35.0.0" --no_https
+        run: sdkmanager --sdk_root=${{ runner.temp }}/android-sdk "platforms;android-35" "build-tools;35.0.0" --no_https
       - name: Build Android APK
         run: ./gradlew :androidApp:assembleDebug --no-daemon --no-parallel
+        env:
+          ANDROID_HOME: ${{ runner.temp }}/android-sdk
+          ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
       - name: Upload APK artifact
         uses: actions/upload-artifact@v8
         if: always()
@@ -74,9 +75,10 @@ jobs:
           name: android-app-debug.apk
           path: androidApp/build/outputs/apk/debug/*.apk
           retention-days: 7
+          archive: false
 
   desktop-build:
-    if: ${{ github.event.inputs.build_target == 'all' || github.event.inputs.build_target == 'desktop' || (github.event_name != 'workflow_dispatch' && github.event.inputs == null) }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_target == 'all' || github.event.inputs.build_target == 'desktop' }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v8
@@ -102,6 +104,7 @@ jobs:
           name: desktop-app.jar
           path: desktopApp/build/libs/*.jar
           retention-days: 7
+          archive: false
 
   create-release:
     needs: [android-build, desktop-build]
@@ -122,10 +125,15 @@ jobs:
           key: ${{ runner.os }}-gradle-release-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-release-
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses --sdk_root=${{ runner.temp }}/android-sdk
       - name: Install Android SDK
-        run: sdkmanager --sdk_root=${{ env.ANDROID_HOME }} "platforms;android-35" "build-tools;35.0.0" --no_https
+        run: sdkmanager --sdk_root=${{ runner.temp }}/android-sdk "platforms;android-35" "build-tools;35.0.0" --no_https
       - name: Build Android APK
         run: ./gradlew :androidApp:assembleDebug --no-daemon --no-parallel
+        env:
+          ANDROID_HOME: ${{ runner.temp }}/android-sdk
+          ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
       - name: Build Desktop
         run: ./gradlew :desktopApp:build --no-daemon --no-parallel
       - name: Create GitHub Release
