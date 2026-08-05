@@ -1,0 +1,8 @@
+com.example.cubic.shared-pngs-0 C:\Users\Administrator\Desktop\cubic_kernel\shared\build\generated\res\pngs\release
+com.example.cubic.shared-resValues-1 C:\Users\Administrator\Desktop\cubic_kernel\shared\build\generated\res\resValues\release
+com.example.cubic.shared-mergeReleaseResources-2 C:\Users\Administrator\Desktop\cubic_kernel\shared\build\intermediates\incremental\release\mergeReleaseResources\merged.dir
+com.example.cubic.shared-mergeReleaseResources-3 C:\Users\Administrator\Desktop\cubic_kernel\shared\build\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+com.example.cubic.shared-release-4 C:\Users\Administrator\Desktop\cubic_kernel\shared\build\intermediates\merged_res\release\mergeReleaseResources
+com.example.cubic.shared-androidMain-5 C:\Users\Administrator\Desktop\cubic_kernel\shared\src\androidMain\res
+com.example.cubic.shared-main-6 C:\Users\Administrator\Desktop\cubic_kernel\shared\src\main\res
+com.example.cubic.shared-release-7 C:\Users\Administrator\Desktop\cubic_kernel\shared\src\release\res
