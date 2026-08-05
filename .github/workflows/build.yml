@@ -50,6 +50,8 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
       - name: Cache Gradle
         uses: actions/cache@v3
         with:
@@ -59,15 +61,8 @@ jobs:
           key: ${{ runner.os }}-gradle-android-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-android-
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses --sdk_root=${{ runner.temp }}/android-sdk
-      - name: Install Android SDK
-        run: sdkmanager --sdk_root=${{ runner.temp }}/android-sdk "platforms;android-35" "build-tools;35.0.0" --no_https
       - name: Build Android APK
         run: ./gradlew :androidApp:assembleDebug --no-daemon --no-parallel
-        env:
-          ANDROID_HOME: ${{ runner.temp }}/android-sdk
-          ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         if: always()
@@ -116,6 +111,8 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
       - name: Cache Gradle
         uses: actions/cache@v3
         with:
@@ -125,15 +122,8 @@ jobs:
           key: ${{ runner.os }}-gradle-release-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-release-
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses --sdk_root=${{ runner.temp }}/android-sdk
-      - name: Install Android SDK
-        run: sdkmanager --sdk_root=${{ runner.temp }}/android-sdk "platforms;android-35" "build-tools;35.0.0" --no_https
       - name: Build Android APK
         run: ./gradlew :androidApp:assembleDebug --no-daemon --no-parallel
-        env:
-          ANDROID_HOME: ${{ runner.temp }}/android-sdk
-          ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
       - name: Build Desktop
         run: ./gradlew :desktopApp:build --no-daemon --no-parallel
       - name: Create GitHub Release
